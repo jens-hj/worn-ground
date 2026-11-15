@@ -13,6 +13,8 @@ public final class Config {
     public static final ModConfigSpec.BooleanValue TRAMPLE_VEGETATION;
     public static final ModConfigSpec.BooleanValue RESPECT_MOB_GRIEFING;
     public static final ModConfigSpec.BooleanValue WEAR_ON_CONTRAPTIONS;
+    public static final ModConfigSpec.BooleanValue CONTRAPTIONS_WEAR_GROUND;
+    public static final ModConfigSpec.DoubleValue CONTRAPTION_MULTIPLIER;
 
     static {
         var builder = new ModConfigSpec.Builder();
@@ -24,7 +26,7 @@ public final class Config {
         SPRINT_MULTIPLIER = builder.comment("Extra chance multiplier while sprinting.")
             .defineInRange("sprintMultiplier", 2.0, 0.0, 1000.0);
         MOB_MULTIPLIER = builder.comment("Extra chance multiplier for mobs.")
-            .defineInRange("mobMultiplier", 0.5, 0.0, 1000.0);
+            .defineInRange("mobMultiplier", 0.25, 0.0, 1000.0);
         SNEAKING_PREVENTS_WEAR = builder.comment("Sneaking never wears the ground.")
             .define("sneakingPreventsWear", true);
         TRAMPLE_VEGETATION = builder.comment(
@@ -34,9 +36,15 @@ public final class Config {
         RESPECT_MOB_GRIEFING = builder.comment("Mobs only wear the ground when the mobGriefing game rule allows it.")
             .define("respectMobGriefing", true);
         WEAR_ON_CONTRAPTIONS = builder.comment(
-                "Also wear blocks of moving physics structures (Sable sub-levels, e.g. Create Aeronautics airships).",
+                "Walking on a moving physics structure (Sable sub-level, e.g. a Create Aeronautics airship) wears its blocks.",
                 "Off by default so decks and gardens on ships stay as built.")
             .define("wearOnContraptions", false);
+        CONTRAPTIONS_WEAR_GROUND = builder.comment(
+                "Sable physics structures wear the ground they drive, roll or slide across (requires Sable).",
+                "Wheels are the blocks in the worn_ground:wheels block tag.")
+            .define("contraptionsWearGround", true);
+        CONTRAPTION_MULTIPLIER = builder.comment("Extra chance multiplier for ground touched by physics structures.")
+            .defineInRange("contraptionMultiplier", 2.0, 0.0, 1000.0);
         SPEC = builder.build();
     }
 

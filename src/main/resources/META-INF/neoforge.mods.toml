@@ -10,7 +10,7 @@ displayName="Worn Ground"
 displayURL="https://modrinth.com/mod/worn-ground"
 logoFile="assets/worn_ground/icon.png"
 authors="jens-hj"
-description='''Players and animals wear desire paths into the ground where they walk. Data-driven, and aware of Sable / Create Aeronautics contraptions.'''
+description='''Players and animals wear desire paths into the ground where they walk. Data-driven; with Sable, Create Aeronautics vehicles leave ruts too.'''
 
 [[dependencies.worn_ground]]
 modId="neoforge"
@@ -24,4 +24,11 @@ modId="minecraft"
 type="required"
 versionRange="[1.21.1,1.21.2)"
 ordering="NONE"
+side="BOTH"
+
+[[dependencies.worn_ground]]
+modId="sable"
+type="optional"
+versionRange="[2.0.0,3.0.0)"
+ordering="AFTER"
 side="BOTH"

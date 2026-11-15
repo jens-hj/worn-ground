@@ -6,7 +6,19 @@ plugins {
 
 java { withSourcesJar(); toolchain.languageVersion = JavaLanguageVersion.of(21) }
 base { archivesName = 'worn-ground' }
-repositories { mavenCentral() }
+repositories {
+    mavenCentral()
+    exclusiveContent {
+        forRepository { maven { name = 'ryanhcode'; url = 'https://maven.ryanhcode.dev/releases' } }
+        filter { includeGroupAndSubgroups 'dev.ryanhcode' }
+    }
+}
+
+dependencies {
+    // Optional integration: physics structures wearing the ground.
+    compileOnly("dev.ryanhcode.sable:sable-neoforge-${project.minecraft_version}:${project.sable_version}") { transitive = false }
+    compileOnly("dev.ryanhcode.sable-companion:sable-companion-common-${project.minecraft_version}:${project.sable_companion_version}") { transitive = false }
+}
 
 sourceSets {
     testmod {
@@ -15,6 +27,9 @@ sourceSets {
     }
 }
 
+def showcaseDirectory = layout.buildDirectory.dir('run/showcase').get().asFile
+def labMode = providers.gradleProperty('lab').getOrElse('all')
+def labDirectory = layout.buildDirectory.dir("run/lab-${labMode}").get().asFile
 def gameTestDirectory = layout.buildDirectory.dir('run/gameTest').get().asFile
 // -PpackMods=<dir> symlinks extra mod jars (e.g. Sable from a modpack instance) into the run.
 def packMods = providers.gradleProperty('packMods')
@@ -33,6 +48,26 @@ neoForge {
             sourceSet = sourceSets.testmod
             gameDirectory = gameTestDirectory
             systemProperty 'neoforge.enabledGameTestNamespaces', 'worn_ground'
+        }
+        // Gallery screenshots, see scripts/headless.py and src/testmod/.../Showcase.java
+        showcase {
+            client()
+            sourceSet = sourceSets.testmod
+            gameDirectory = showcaseDirectory
+            programArguments.addAll('--width', '1920', '--height', '1080')
+            systemProperty 'wornground.showcase', layout.buildDirectory.dir('showcase').get().asFile.absolutePath
+            systemProperty 'wornground.showcase.mode', providers.gradleProperty('showcaseMode').getOrElse('scenes')
+            systemProperty 'wornground.showcase.siteOnly', providers.gradleProperty('siteOnly').isPresent().toString()
+            systemProperty 'wornground.showcase.interval', providers.gradleProperty('showcaseInterval').getOrElse('1200')
+        }
+        // Headless measurement server, see src/testmod/.../Lab.java
+        lab {
+            server()
+            sourceSet = sourceSets.testmod
+            gameDirectory = labDirectory
+            programArgument '--nogui'
+            systemProperty 'wornground.lab', labMode
+            systemProperty 'wornground.lab.out', layout.buildDirectory.file("lab/${labMode}.json").get().asFile.absolutePath
         }
     }
     runs.configureEach { jvmArgument '-Xmx3G' }
@@ -69,6 +104,27 @@ tasks.named('runGameTestServer') {
     }
 }
 
+tasks.named('runShowcase') {
+    doFirst {
+        prepareRun(showcaseDirectory)
+        new File(showcaseDirectory, 'saves/showcase').deleteDir()
+        def options = new File(showcaseDirectory, 'options.txt')
+        def keep = options.readLines().findAll { !(it.split(':', 2)[0] in ['renderDistance', 'simulationDistance', 'fov', 'renderClouds', 'graphicsMode', 'maxFps', 'bobView']) }
+        options.text = (keep + ['renderDistance:10', 'simulationDistance:5', 'fov:-0.25', 'renderClouds:"true"', 'graphicsMode:1', 'maxFps:30', 'bobView:false']).join('\n') + '\n'
+    }
+}
+tasks.named('runLab') {
+    doFirst {
+        prepareRun(labDirectory)
+        new File(labDirectory, 'world').deleteDir()
+        new File(labDirectory, 'eula.txt').text = 'eula=true\n'
+        new File(labDirectory, 'server.properties').text = [
+            'level-type=minecraft\\:flat', 'generate-structures=false', 'online-mode=false', "server-port=${labMode == 'all' ? 25599 : 25598}",
+            'max-tick-time=-1', 'view-distance=4', 'simulation-distance=4', 'spawn-protection=0', 'level-seed=7'
+        ].join('\n') + '\n'
+    }
+}
+
 tasks.withType(Jar).configureEach { from('LICENSE') }
 def releaseVersion = project.version.toString()
 processResources {
@@ -95,6 +151,8 @@ modrinth {
     gameVersions = [project.minecraft_version]
     loaders = ['neoforge']
     changelog = currentChangelog
+    environment = 'server_only_client_optional'
+    dependencies { optional.project 'sable' }
     syncBodyFrom = file('docs/MODRINTH.md').text
 }
 tasks.named('modrinth') { notCompatibleWithConfigurationCache('Minotaur reads Task.project') }

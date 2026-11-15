@@ -8,6 +8,7 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.ModContainer;
+import net.neoforged.fml.ModList;
 import net.neoforged.fml.common.Mod;
 import net.neoforged.fml.config.ModConfig;
 import net.neoforged.neoforge.common.NeoForge;
@@ -26,12 +27,16 @@ public final class WornGround {
 
     public static final TagKey<EntityType<?>> PATH_MAKERS = TagKey.create(Registries.ENTITY_TYPE, id("path_makers"));
     public static final TagKey<Block> TRAMPLEABLE = TagKey.create(Registries.BLOCK, id("trampleable"));
+    public static final TagKey<Block> WHEELS = TagKey.create(Registries.BLOCK, id("wheels"));
     public static final TagKey<Item> SOFT_SOLES = TagKey.create(Registries.ITEM, id("soft_soles"));
 
     public WornGround(IEventBus modBus, ModContainer container) {
         container.registerConfig(ModConfig.Type.COMMON, Config.SPEC);
         modBus.addListener((RegisterDataMapTypesEvent event) -> event.register(WEAR));
         NeoForge.EVENT_BUS.register(WearHandler.class);
+        if (ModList.get().isLoaded("sable")) {
+            NeoForge.EVENT_BUS.register(dev.jensh.wornground.compat.SubLevelWear.class);
+        }
     }
 
     public static ResourceLocation id(String path) {
