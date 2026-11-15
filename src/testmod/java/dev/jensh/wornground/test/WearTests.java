@@ -99,6 +99,16 @@ public final class WearTests {
         test.succeed();
     }
 
+    /** With Sable installed: a physics structure sliding over grass wears it. Trivially passes without Sable. */
+    @GameTest(template = "empty", timeoutTicks = 400)
+    public static void slidingContraptionWearsGround(GameTestHelper test) {
+        if (!net.neoforged.fml.ModList.get().isLoaded("sable")) {
+            test.succeed();
+            return;
+        }
+        SableChecks.sliding(test);
+    }
+
     /** End to end: a real mob walking across grass leaves a trail. */
     @GameTest(template = "empty", timeoutTicks = 400)
     public static void walkingCowWearsATrail(GameTestHelper test) {
