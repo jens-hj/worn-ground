@@ -1,0 +1,9 @@
+{
+  "values": {
+    "minecraft:grass_block": { "result": "minecraft:dirt", "chance": 0.06 },
+    "minecraft:podzol": { "result": "minecraft:dirt", "chance": 0.06 },
+    "minecraft:mycelium": { "result": "minecraft:dirt", "chance": 0.06 },
+    "minecraft:dirt": { "result": "minecraft:coarse_dirt", "chance": 0.03 },
+    "minecraft:coarse_dirt": { "result": "minecraft:dirt_path", "chance": 0.02 }
+  }
+}
