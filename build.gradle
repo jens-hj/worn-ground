@@ -1,0 +1,101 @@
+plugins {
+    id 'java-library'
+    id 'net.neoforged.moddev' version '2.0.148'
+    id 'com.modrinth.minotaur' version '2.10.0'
+}
+
+java { withSourcesJar(); toolchain.languageVersion = JavaLanguageVersion.of(21) }
+base { archivesName = 'worn-ground' }
+repositories { mavenCentral() }
+
+sourceSets {
+    testmod {
+        compileClasspath += sourceSets.main.compileClasspath + sourceSets.main.output
+        runtimeClasspath += sourceSets.main.runtimeClasspath + sourceSets.main.output
+    }
+}
+
+def gameTestDirectory = layout.buildDirectory.dir('run/gameTest').get().asFile
+// -PpackMods=<dir> symlinks extra mod jars (e.g. Sable from a modpack instance) into the run.
+def packMods = providers.gradleProperty('packMods')
+def packModNames = providers.gradleProperty('packModNames').getOrElse('')
+neoForge {
+    version = project.neo_version
+    mods {
+        worn_ground { sourceSet sourceSets.main }
+        worn_ground_test { sourceSet sourceSets.testmod }
+    }
+    runs {
+        client { client() }
+        server { server(); programArgument '--nogui' }
+        gameTestServer {
+            type = 'gameTestServer'
+            sourceSet = sourceSets.testmod
+            gameDirectory = gameTestDirectory
+            systemProperty 'neoforge.enabledGameTestNamespaces', 'worn_ground'
+        }
+    }
+    runs.configureEach { jvmArgument '-Xmx3G' }
+}
+
+def prepareRun = { File directory ->
+    directory.mkdirs()
+    // Keep every graphical launch silent and free of first-run screens.
+    def options = new File(directory, 'options.txt')
+    def lines = options.exists() ? options.readLines().findAll {
+        !(it.split(':', 2)[0] in ['soundCategory_master', 'soundCategory_music', 'onboardAccessibility',
+                                  'narrator', 'pauseOnLostFocus', 'fullscreen', 'tutorialStep'])
+    } : []
+    options.text = (lines + ['soundCategory_master:0.0', 'soundCategory_music:0.0',
+        'onboardAccessibility:false', 'narrator:0', 'pauseOnLostFocus:false', 'fullscreen:false',
+        'tutorialStep:none']).join('\n') + '\n'
+    def mods = new File(directory, 'mods'); mods.mkdirs()
+    mods.listFiles().findAll { java.nio.file.Files.isSymbolicLink(it.toPath()) }.each { it.delete() }
+    if (packMods.isPresent()) {
+        def wanted = packModNames.split(',').findAll { it }
+        new File(packMods.get()).listFiles().findAll { jar ->
+            jar.name.endsWith('.jar') && !jar.name.startsWith('worn-ground-') &&
+                (wanted.isEmpty() || wanted.any { jar.name.startsWith(it) })
+        }.each { source ->
+            java.nio.file.Files.createSymbolicLink(new File(mods, source.name).toPath(), source.toPath().toRealPath())
+        }
+    }
+}
+tasks.named('runClient') { doFirst { prepareRun(file('run')) } }
+tasks.named('runGameTestServer') {
+    doFirst {
+        prepareRun(gameTestDirectory)
+        new File(gameTestDirectory, 'world').deleteDir()
+    }
+}
+
+tasks.withType(Jar).configureEach { from('LICENSE') }
+def releaseVersion = project.version.toString()
+processResources {
+    inputs.property 'version', releaseVersion
+    filesMatching('META-INF/neoforge.mods.toml') { expand version: releaseVersion }
+}
+
+def modrinthToken = providers.environmentVariable('MODRINTH_TOKEN').orElse(
+    providers.fileContents(layout.projectDirectory.file(
+        "${System.getProperty('user.home')}/.config/modrinth-token")).asText.map { it.trim() })
+def currentChangelog = providers.fileContents(layout.projectDirectory.file('CHANGELOG.md')).asText.map { text ->
+    def section = text.split(/(?m)^## /).find { it.startsWith("${version}\n") || it.startsWith("${version}\r") }
+    section ? section.substring(section.indexOf('\n') + 1).trim() : ''
+}
+modrinth {
+    debugMode = providers.gradleProperty('modrinthDryRun').isPresent()
+    token = modrinthToken
+    projectId = 'worn-ground'
+    versionNumber = project.version.toString()
+    versionName = "${project.version} (NeoForge ${project.minecraft_version})"
+    versionType = 'release'
+    uploadFile = jar
+    additionalFiles { sourcesJar(tasks.named('sourcesJar')) }
+    gameVersions = [project.minecraft_version]
+    loaders = ['neoforge']
+    changelog = currentChangelog
+    syncBodyFrom = file('docs/MODRINTH.md').text
+}
+tasks.named('modrinth') { notCompatibleWithConfigurationCache('Minotaur reads Task.project') }
+tasks.named('modrinthSyncBody') { notCompatibleWithConfigurationCache('Minotaur reads Task.project') }
