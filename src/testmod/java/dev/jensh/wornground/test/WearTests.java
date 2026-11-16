@@ -8,6 +8,8 @@ import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.DoublePlantBlock;
+import net.minecraft.world.level.block.state.properties.DoubleBlockHalf;
 import net.neoforged.neoforge.gametest.GameTestHolder;
 import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 
@@ -68,14 +70,47 @@ public final class WearTests {
     }
 
     @GameTest(template = "empty")
-    public static void flowersSurviveAndBlockPathStage(GameTestHelper test) {
+    public static void flowersAreTrampledLikeGrass(GameTestHelper test) {
         test.setBlock(GROUND, Blocks.GRASS_BLOCK);
         test.setBlock(GROUND.above(), Blocks.POPPY);
+        test.assertTrue(step(test, ALWAYS), "First step flattens the flower");
+        test.assertBlockPresent(Blocks.AIR, GROUND.above());
+        test.assertBlockPresent(Blocks.GRASS_BLOCK, GROUND);
+        test.setBlock(GROUND.above(), Blocks.ROSE_BUSH);
+        test.setBlock(GROUND.above(2), Blocks.ROSE_BUSH.defaultBlockState().setValue(DoublePlantBlock.HALF, DoubleBlockHalf.UPPER));
+        test.assertTrue(step(test, ALWAYS), "A tall flower is flattened whole");
+        test.assertBlockPresent(Blocks.AIR, GROUND.above());
+        test.assertBlockPresent(Blocks.AIR, GROUND.above(2));
+        stepExpecting(test, Blocks.DIRT);
+        test.succeed();
+    }
+
+    @GameTest(template = "empty")
+    public static void keptFlowersSurviveAndBlockPathStage(GameTestHelper test) {
+        // Synchronous, so no other test sees the changed config.
+        Config.TRAMPLE_FLOWERS.set(false);
+        try {
+            test.setBlock(GROUND, Blocks.GRASS_BLOCK);
+            test.setBlock(GROUND.above(), Blocks.POPPY);
+            stepExpecting(test, Blocks.DIRT);
+            stepExpecting(test, Blocks.COARSE_DIRT);
+            test.assertFalse(step(test, ALWAYS), "A path block would uproot the flower");
+            test.assertBlockPresent(Blocks.COARSE_DIRT, GROUND);
+            test.assertBlockPresent(Blocks.POPPY, GROUND.above());
+        } finally {
+            Config.TRAMPLE_FLOWERS.set(true);
+        }
+        test.succeed();
+    }
+
+    @GameTest(template = "empty")
+    public static void saplingsKeepTheirSupport(GameTestHelper test) {
+        test.setBlock(GROUND, Blocks.GRASS_BLOCK);
+        test.setBlock(GROUND.above(), Blocks.OAK_SAPLING);
         stepExpecting(test, Blocks.DIRT);
         stepExpecting(test, Blocks.COARSE_DIRT);
-        test.assertFalse(step(test, ALWAYS), "A path block would uproot the flower");
-        test.assertBlockPresent(Blocks.COARSE_DIRT, GROUND);
-        test.assertBlockPresent(Blocks.POPPY, GROUND.above());
+        test.assertFalse(step(test, ALWAYS), "A path block would uproot the sapling");
+        test.assertBlockPresent(Blocks.OAK_SAPLING, GROUND.above());
         test.succeed();
     }
 

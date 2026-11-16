@@ -127,6 +127,11 @@ public final class Showcase {
         }
         if (Boolean.getBoolean("wornground.showcase.siteOnly")) return;
         steps.add(onServer(this::buildScenes));
+        if ("safe".equals(System.getProperty("wornground.showcase.mode"))) {
+            traffic(300);
+            shot("safe", 53, 10, 55, 180, 40);
+            return;
+        }
         shot("timelapse-0", 15, 15, 24, 180, 36);
         shot("pen-0", 55, 12, 16, 180, 38);
         traffic(20);
@@ -372,7 +377,7 @@ public final class Showcase {
         route(1.0, 4, at(level, 0, 42), at(level, 26, 42));
         route(0.0, 5, at(level, 0, 48), at(level, 26, 48));
 
-        // Builds stay safe: a route crossing a railway and a flower bed.
+        // A route crossing a railway (kept) and a flower bed (trampled).
         for (int z = 30; z <= 54; z++) {
             BlockPos ground = at(level, 50, z);
             set(level, ground, Blocks.GRAVEL.defaultBlockState());
