@@ -6,7 +6,7 @@ Walk the same way often enough and the ground remembers. Players and animals slo
 
 Inspired by [TFC Desire Paths](https://modrinth.com/mod/tfc-desire-paths), built for non-TFC NeoForge packs — in particular Create-style engineering packs.
 
-<p align="center"><img src="https://raw.githubusercontent.com/jens-hj/worn-ground/main/docs/gallery/01-timelapse.jpg" width="900"></p>
+<p align="center"><img alt="Four views of the same meadow with a cabin, a well and a field: untouched, then after 20, 80 and 300 trips. Dirt paths gradually appear between the buildings." src="https://raw.githubusercontent.com/jens-hj/worn-ground/main/docs/gallery/01-timelapse.jpg" width="900"></p>
 
 ## How it works
 
@@ -19,7 +19,7 @@ Inspired by [TFC Desire Paths](https://modrinth.com/mod/tfc-desire-paths), built
 - **Vehicles leave ruts**: with [Sable](https://modrinth.com/mod/sable) installed, the wheels of [Create Aeronautics](https://modrinth.com/mod/create-aeronautics) / Offroad vehicles wear two tracks, and hulls or sleds wear whatever they are dragged across.
 - Podzol and mycelium wear to dirt as well.
 
-<p align="center"><img src="https://raw.githubusercontent.com/jens-hj/worn-ground/main/docs/gallery/04-vehicle-ruts.jpg" width="900"></p>
+<p align="center"><img alt="An Offroad car driving across grass after 3, 13 and 41 passes, leaving two parallel wheel ruts that deepen from dirt to dirt path." src="https://raw.githubusercontent.com/jens-hj/worn-ground/main/docs/gallery/04-vehicle-ruts.jpg" width="900"></p>
 
 ## How long does it take?
 
@@ -38,7 +38,7 @@ Measured in-game with the default config on a 32-block route across grass, with 
 - A route walked only **once a day** stays a faint trail: after 100 days it is still mostly plain dirt and grass, because the grass keeps growing back.
 - A single crossing leaves at most a few dirt patches that regrow.
 
-<p align="center"><img src="https://raw.githubusercontent.com/jens-hj/worn-ground/main/docs/gallery/03-how-many-trips.jpg" width="900"></p>
+<p align="center"><img alt="Four stacked area charts showing the share of grass, dirt, coarse dirt and dirt path on a route over 300 trips for walking, sprinting and sprint-jumping, and over 60 passes for an Offroad car." src="https://raw.githubusercontent.com/jens-hj/worn-ground/main/docs/gallery/03-how-many-trips.jpg" width="900"></p>
 
 Too fast or too slow for your pack? `chanceMultiplier` scales everything.
 
@@ -51,7 +51,7 @@ Too fast or too slow for your pack? `chanceMultiplier` scales everything.
 - **[Block Runner](https://modrinth.com/mod/block-runner)**: worn-in paths are real dirt path blocks, so they get its speed boost.
 - Server-side: only the server (or the single-player world) needs the mod.
 
-<p align="center"><img src="https://raw.githubusercontent.com/jens-hj/worn-ground/main/docs/gallery/07-rails-and-flowers.jpg" width="900"></p>
+<p align="center"><img alt="A worn route crossing a railway and a flower bed: the rail is intact on its ground, and the flowers along the route have been trampled." src="https://raw.githubusercontent.com/jens-hj/worn-ground/main/docs/gallery/07-rails-and-flowers.jpg" width="900"></p>
 
 ## Configuration
 
