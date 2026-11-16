@@ -67,6 +67,10 @@ neoForge {
             gameDirectory = labDirectory
             programArgument '--nogui'
             systemProperty 'wornground.lab', labMode
+            if (labMode == 'perf') {
+                jvmArgument "-XX:StartFlightRecording=filename=${layout.buildDirectory.file('lab/perf.jfr').get().asFile.absolutePath},settings=profile"
+                systemProperty 'wornground.perf.cows', providers.gradleProperty('perfCows').getOrElse('300')
+            }
             systemProperty 'wornground.lab.out', layout.buildDirectory.file("lab/${labMode}.json").get().asFile.absolutePath
         }
     }
