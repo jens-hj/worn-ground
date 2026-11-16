@@ -15,6 +15,8 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.neoforge.event.EventHooks;
 import net.neoforged.neoforge.event.entity.EntityLeaveLevelEvent;
+import net.neoforged.neoforge.event.entity.living.LivingFallEvent;
+import net.neoforged.neoforge.event.entity.player.PlayerFlyableFallEvent;
 import net.neoforged.neoforge.event.server.ServerStoppedEvent;
 import net.neoforged.neoforge.event.tick.EntityTickEvent;
 
@@ -27,6 +29,8 @@ public final class WearHandler {
      */
     private static final int MAX_GROUND_DISTANCE_SQUARED = 4 * 4;
     private static final long NO_BLOCK = Long.MIN_VALUE;
+    /** A jump on level ground falls about 1.25 blocks; walking down a slab or stair (0.5) is not a landing. */
+    private static final float MIN_LANDING_FALL = 0.75F;
 
     /** Last supporting block per entity id, so wear is rolled once per block stepped onto. Server thread only. */
     private static final Int2LongOpenHashMap LAST_BLOCK = new Int2LongOpenHashMap();
@@ -40,9 +44,7 @@ public final class WearHandler {
     @SubscribeEvent
     public static void onEntityTick(EntityTickEvent.Post event) {
         if (!(event.getEntity() instanceof LivingEntity entity) || !entity.onGround()
-            || !(entity.level() instanceof ServerLevel level)) return;
-        boolean player = entity instanceof Player;
-        if (player ? !Config.PLAYERS.get() : !Config.MOBS.get() || !entity.getType().is(WornGround.PATH_MAKERS)) return;
+            || !(entity.level() instanceof ServerLevel level) || !makesPaths(entity)) return;
 
         BlockPos ground = entity.getOnPos();
         long key = ground.asLong();
@@ -50,11 +52,42 @@ public final class WearHandler {
         // The first sighting (spawn, login, landing from a ride) is not a step.
         if (previous == key || previous == NO_BLOCK) return;
         if (!canWear(level, entity, ground)) return;
+        tryWear(level, ground, multiplier(entity), entity.getRandom());
+    }
 
+    @SubscribeEvent
+    public static void onFall(LivingFallEvent event) {
+        onLanding(event.getEntity(), event.getDistance());
+    }
+
+    /** Players who may fly (creative) never take fall damage and get their own event. */
+    @SubscribeEvent
+    public static void onFlyableFall(PlayerFlyableFallEvent event) {
+        onLanding(event.getEntity(), event.getDistance());
+    }
+
+    /**
+     * Coming down from a jump or a drop is a heavier step than walking. Vanilla reports every landing here, also the
+     * single-tick ground contact of a sprint-jumping player that the tick handler could miss.
+     */
+    private static void onLanding(LivingEntity entity, float fallDistance) {
+        if (fallDistance < MIN_LANDING_FALL || !(entity.level() instanceof ServerLevel level) || !makesPaths(entity)) return;
+        BlockPos ground = entity.getOnPos();
+        // The landing is this block's step; the tick handler must not roll it again.
+        LAST_BLOCK.put(entity.getId(), ground.asLong());
+        if (!canWear(level, entity, ground)) return;
+        tryWear(level, ground, multiplier(entity) * Config.LANDING_MULTIPLIER.get(), entity.getRandom());
+    }
+
+    private static boolean makesPaths(LivingEntity entity) {
+        return entity instanceof Player ? Config.PLAYERS.get() : Config.MOBS.get() && entity.getType().is(WornGround.PATH_MAKERS);
+    }
+
+    private static double multiplier(LivingEntity entity) {
         double multiplier = Config.CHANCE_MULTIPLIER.get();
         if (entity.isSprinting()) multiplier *= Config.SPRINT_MULTIPLIER.get();
-        if (!player) multiplier *= Config.MOB_MULTIPLIER.get();
-        tryWear(level, ground, multiplier, entity.getRandom());
+        if (!(entity instanceof Player)) multiplier *= Config.MOB_MULTIPLIER.get();
+        return multiplier;
     }
 
     private static boolean canWear(ServerLevel level, LivingEntity entity, BlockPos ground) {

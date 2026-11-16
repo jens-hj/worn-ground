@@ -8,6 +8,7 @@ public final class Config {
     public static final ModConfigSpec.BooleanValue MOBS;
     public static final ModConfigSpec.DoubleValue CHANCE_MULTIPLIER;
     public static final ModConfigSpec.DoubleValue SPRINT_MULTIPLIER;
+    public static final ModConfigSpec.DoubleValue LANDING_MULTIPLIER;
     public static final ModConfigSpec.DoubleValue MOB_MULTIPLIER;
     public static final ModConfigSpec.BooleanValue SNEAKING_PREVENTS_WEAR;
     public static final ModConfigSpec.BooleanValue TRAMPLE_VEGETATION;
@@ -25,6 +26,10 @@ public final class Config {
             .defineInRange("chanceMultiplier", 1.0, 0.0, 1000.0);
         SPRINT_MULTIPLIER = builder.comment("Extra chance multiplier while sprinting.")
             .defineInRange("sprintMultiplier", 2.0, 0.0, 1000.0);
+        LANDING_MULTIPLIER = builder.comment(
+                "Extra chance multiplier for the block landed on after a jump or a drop.",
+                "At 4, sprint-jumping (one landing every ~4 blocks) wears a route about as fast as sprinting along it.")
+            .defineInRange("landingMultiplier", 4.0, 0.0, 1000.0);
         MOB_MULTIPLIER = builder.comment("Extra chance multiplier for mobs.")
             .defineInRange("mobMultiplier", 0.25, 0.0, 1000.0);
         SNEAKING_PREVENTS_WEAR = builder.comment("Sneaking never wears the ground.")
