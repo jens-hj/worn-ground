@@ -130,8 +130,9 @@ if __name__ == "__main__":
     single("gaits", "YOUR PACE DECIDES", "The same 300 trips on each line.", "06-sprint-walk-sneak.jpg", labels=[
         ((480, 318), "sprinting: twice the wear", "lm"), ((480, 458), "walking", "lm"),
         ((480, 640), "sneaking or leather boots: no trace", "lm")])
-    single("safe", "YOUR BUILDS STAY PUT", "Ground under rails, tracks, crops and flowers is never turned into a path block.",
-           "07-rails-and-flowers.jpg", labels=[((1330, 470), "rail keeps its footing", "mb"), ((1580, 560), "flowers stay", "lm")])
+    single("safe", "YOUR BUILDS STAY PUT", "Ground under rails, tracks, machines and crops is never turned into a path block.",
+           "07-rails-and-flowers.jpg", labels=[((590, 522), "rail keeps its footing", "mb"),
+                                               ((1400, 800), "flowers get trampled (optional)", "mb")])
     single("stages", "FOUR STAGES", "Grass regrows over plain dirt. Coarse dirt and paths stay until you dig or hoe them.",
            "08-stages.jpg", labels=[((320, 470), "grass", "mb"), ((720, 470), "dirt", "mb"), ((1108, 470), "coarse dirt", "mb"),
                                     ((1480, 470), "dirt path", "mb")])

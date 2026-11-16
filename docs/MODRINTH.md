@@ -14,7 +14,7 @@ Inspired by [TFC Desire Paths](https://modrinth.com/mod/tfc-desire-paths), built
 - Grass grows back over plain dirt by itself, so a route only turns into a lasting path if it keeps being used. Coarse dirt and paths stay until you dig or hoe them.
 - **Jumping** counts: the block you land on takes a four times heavier step, so sprint-jumping everywhere still wears a path in about as fast as sprinting.
 - **Sprinting** wears the ground twice as fast. **Sneaking** leaves no trace, and neither do **leather boots**.
-- Tall grass and ferns are trampled before the ground below them wears.
+- Tall grass, ferns and **flowers** are trampled before the ground below them wears. Want your flower beds safe? Turn off `trampleFlowers`.
 - Livestock, horses, villagers, golems and other heavy mobs make paths too (at a quarter of the player rate), so pens and village routes get worn in over time. Respects the `mobGriefing` game rule.
 - **Vehicles leave ruts**: with [Sable](https://modrinth.com/mod/sable) installed, the wheels of [Create Aeronautics](https://modrinth.com/mod/create-aeronautics) / Offroad vehicles wear two tracks, and hulls or sleds wear whatever they are dragged across.
 - Podzol and mycelium wear to dirt as well.
@@ -44,7 +44,7 @@ Too fast or too slow for your pack? `chanceMultiplier` scales everything.
 
 ## Plays nice with the rest of your pack
 
-- **Never removes support**: ground under rails, Create tracks, machines, crops, flowers or anything else is only swapped for another full, plant-friendly block — a path block only ever forms under open air.
+- **Never removes support**: ground under rails, Create tracks, machines, crops, saplings or anything else is only swapped for another full, plant-friendly block — a path block only ever forms under open air.
 - **[Sable](https://modrinth.com/mod/sable) / [Create Aeronautics](https://modrinth.com/mod/create-aeronautics)**: vehicles wear the ground they drive on, while decks and gardens *on* airships and other physics contraptions are left untouched by default (`wearOnContraptions`).
 - **[Dynamic Trees](https://modrinth.com/mod/dynamictrees)**: root soil blocks are never touched.
 - **Farmland** keeps its vanilla trampling behaviour.
@@ -55,7 +55,7 @@ Too fast or too slow for your pack? `chanceMultiplier` scales everything.
 
 ## Configuration
 
-`config/worn_ground-common.toml`: toggle players / mobs / vehicles, global chance multiplier, sprint, landing, mob and vehicle multipliers, sneaking, trampling, `mobGriefing`, wear on contraption decks.
+`config/worn_ground-common.toml`: toggle players / mobs / vehicles, global chance multiplier, sprint, landing, mob and vehicle multipliers, sneaking, trampling (plants and flowers separately), `mobGriefing`, wear on contraption decks.
 
 ## Datapacks
 
@@ -84,5 +84,6 @@ Everything is data-driven.
 | --- | --- |
 | `worn_ground:path_makers` (entity type) | Mobs that wear the ground. Players always do. |
 | `worn_ground:trampleable` (block) | Plants that are flattened before the ground wears. |
+| `worn_ground:trampleable_flowers` (block) | Flowers that are flattened too while `trampleFlowers` is on. |
 | `worn_ground:soft_soles` (item) | Boots that prevent wear. |
 | `worn_ground:wheels` (block) | Blocks whose tire touches the ground beside them (Offroad wheel mounts). |
