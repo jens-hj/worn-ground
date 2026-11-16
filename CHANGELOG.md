@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.4.0
+- Flowers are now trampled like tall grass before the ground under them wears. Set `trampleFlowers = false` to keep flower beds untouched as before.
+- Which flowers count is the `worn_ground:trampleable_flowers` block tag.
+
 ## 0.3.0
 - Landing from a jump or a drop is a heavier step: the block you land on wears four times as fast (`landingMultiplier`).
 - Sprint-jumping along a route now wears it in about as fast as sprinting, instead of barely at all.
