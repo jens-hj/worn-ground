@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.3.0
+- Landing from a jump or a drop is a heavier step: the block you land on wears four times as fast (`landingMultiplier`).
+- Sprint-jumping along a route now wears it in about as fast as sprinting, instead of barely at all.
+- Jumps are picked up reliably even when you only touch the ground for a moment between them, also in creative mode.
+
 ## 0.2.0
 - Vehicles leave ruts: with Sable installed, Create Aeronautics / Offroad wheels and anything else a physics structure drags or lands on the ground now wear it (`contraptionsWearGround`, `contraptionMultiplier`; wheels come from the `worn_ground:wheels` block tag).
 - Mobs now wear at a quarter of the player rate instead of half, so a pen takes about a week to wear in rather than three days.
