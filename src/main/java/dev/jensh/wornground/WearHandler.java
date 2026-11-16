@@ -127,11 +127,12 @@ public final class WearHandler {
         BlockState above = level.getBlockState(abovePos);
         BlockState worn = result.defaultBlockState();
         if (!above.isAir()) {
-            if (Config.TRAMPLE_VEGETATION.get() && above.is(WornGround.TRAMPLEABLE)) {
+            if (Config.TRAMPLE_VEGETATION.get() && (above.is(WornGround.TRAMPLEABLE)
+                || Config.TRAMPLE_FLOWERS.get() && above.is(WornGround.TRAMPLEABLE_FLOWERS))) {
                 // Flattening the plant is this step's wear; the ground follows on a later step.
                 return level.destroyBlock(abovePos, false);
             }
-            // Never pull the support out from under rails, tracks, machines, crops, flowers...
+            // Never pull the support out from under rails, tracks, machines, crops, saplings...
             boolean keepsSupport = worn.isFaceSturdy(level, pos, Direction.UP)
                 && (!state.is(BlockTags.DIRT) || worn.is(BlockTags.DIRT));
             if (!keepsSupport) return false;

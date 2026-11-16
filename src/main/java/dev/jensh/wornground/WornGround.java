@@ -27,6 +27,7 @@ public final class WornGround {
 
     public static final TagKey<EntityType<?>> PATH_MAKERS = TagKey.create(Registries.ENTITY_TYPE, id("path_makers"));
     public static final TagKey<Block> TRAMPLEABLE = TagKey.create(Registries.BLOCK, id("trampleable"));
+    public static final TagKey<Block> TRAMPLEABLE_FLOWERS = TagKey.create(Registries.BLOCK, id("trampleable_flowers"));
     public static final TagKey<Block> WHEELS = TagKey.create(Registries.BLOCK, id("wheels"));
     public static final TagKey<Item> SOFT_SOLES = TagKey.create(Registries.ITEM, id("soft_soles"));
 

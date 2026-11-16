@@ -12,6 +12,7 @@ public final class Config {
     public static final ModConfigSpec.DoubleValue MOB_MULTIPLIER;
     public static final ModConfigSpec.BooleanValue SNEAKING_PREVENTS_WEAR;
     public static final ModConfigSpec.BooleanValue TRAMPLE_VEGETATION;
+    public static final ModConfigSpec.BooleanValue TRAMPLE_FLOWERS;
     public static final ModConfigSpec.BooleanValue RESPECT_MOB_GRIEFING;
     public static final ModConfigSpec.BooleanValue WEAR_ON_CONTRAPTIONS;
     public static final ModConfigSpec.BooleanValue CONTRAPTIONS_WEAR_GROUND;
@@ -38,6 +39,10 @@ public final class Config {
                 "Plants in the worn_ground:trampleable block tag are flattened before the ground below wears.",
                 "When false, ground with such plants on it is left alone unless the plant can stay.")
             .define("trampleVegetation", true);
+        TRAMPLE_FLOWERS = builder.comment(
+                "Flowers (worn_ground:trampleable_flowers block tag) are flattened like tall grass. Needs trampleVegetation.",
+                "When false, flowers stay and the ground under them never becomes a path block.")
+            .define("trampleFlowers", true);
         RESPECT_MOB_GRIEFING = builder.comment("Mobs only wear the ground when the mobGriefing game rule allows it.")
             .define("respectMobGriefing", true);
         WEAR_ON_CONTRAPTIONS = builder.comment(
