@@ -12,6 +12,7 @@ Inspired by [TFC Desire Paths](https://modrinth.com/mod/tfc-desire-paths), built
 
 - Every time a player or animal steps onto a new block, there is a small chance the block wears one stage.
 - Grass grows back over plain dirt by itself, so a route only turns into a lasting path if it keeps being used. Coarse dirt and paths stay until you dig or hoe them.
+- **Jumping** counts: the block you land on takes a four times heavier step, so sprint-jumping everywhere still wears a path in about as fast as sprinting.
 - **Sprinting** wears the ground twice as fast. **Sneaking** leaves no trace, and neither do **leather boots**.
 - Tall grass and ferns are trampled before the ground below them wears.
 - Livestock, horses, villagers, golems and other heavy mobs make paths too (at a quarter of the player rate), so pens and village routes get worn in over time. Respects the `mobGriefing` game rule.
@@ -28,6 +29,8 @@ Measured in-game with the default config on a 32-block route across grass, with 
 | --- | --- | --- | --- |
 | Walking | ~27 trips | ~104 trips | ~213 trips |
 | Sprinting | ~17 trips | ~58 trips | ~113 trips |
+| Sprint-jumping | ~16 trips | ~56 trips | ~120 trips |
+| Jumping at walking pace | ~21 trips | ~72 trips | ~154 trips |
 | Offroad car | ~3 passes | ~13 passes | ~25 passes |
 | 4 cows in a 9×9 pen | ~1.5 days | ~5 days | ~11 days |
 
@@ -52,7 +55,7 @@ Too fast or too slow for your pack? `chanceMultiplier` scales everything.
 
 ## Configuration
 
-`config/worn_ground-common.toml`: toggle players / mobs / vehicles, global chance multiplier, sprint, mob and vehicle multipliers, sneaking, trampling, `mobGriefing`, wear on contraption decks.
+`config/worn_ground-common.toml`: toggle players / mobs / vehicles, global chance multiplier, sprint, landing, mob and vehicle multipliers, sneaking, trampling, `mobGriefing`, wear on contraption decks.
 
 ## Datapacks
 

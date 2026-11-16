@@ -73,16 +73,17 @@ def chart(file):
     image = Image.new("RGB", (W, H), PAPER)
     draw = ImageDraw.Draw(image)
     draw.text((60, 40), "HOW MANY TRIPS UNTIL A PATH?", font=font(54), fill=INK)
-    draw.text((60, 108), "Measured in-game: a 32-block route across grass, one trip per minute, real grass regrowth. Mean of 6 runs.",
+    draw.text((60, 108), "Measured in-game: 32 blocks of grass, one trip a minute, real regrowth. Mean of 6 runs (car: 1 run).",
               font=font(24, False), fill=INK)
     panels = [("WALKING", data["lanes"]["every-minute/walk"], 300, "trips"),
               ("SPRINTING", data["lanes"]["every-minute/sprint"], 300, "trips"),
+              ("SPRINT-JUMPING", data["lanes"]["every-minute/sprint-jump"], 300, "trips"),
               ("OFFROAD CAR", data["vehicles"]["car/every-minute"], 60, "passes")]
     keys = list(COLOURS)
     for index, (name, series, limit, unit) in enumerate(panels):
-        x0, y0, w, h = 60 + index * 620, 240, 560, 560
+        x0, y0, w, h = 60 + index * 462, 270, 414, 530
         series = series[:limit]
-        draw.text((x0, y0 - 56), name, font=font(40), fill=INK)
+        draw.text((x0, y0 - 50), name, font=font(34), fill=INK)
         # Stacked areas, most worn stage at the bottom.
         order = [3, 2, 1, 0]
         base = [0.0] * len(series)
@@ -93,16 +94,16 @@ def chart(file):
             draw.polygon(points, fill=COLOURS[keys[k]])
             base = top
         draw.rectangle((x0, y0, x0 + w, y0 + h), outline=INK, width=4)
-        for tick in range(0, limit + 1, limit // 6):
+        for tick in range(0, limit + 1, limit // 3):
             x = x0 + w * tick / limit
             draw.line((x, y0 + h, x, y0 + h + 12), fill=INK, width=3)
-            draw.text((x, y0 + h + 18), str(tick), font=font(22, False), fill=INK, anchor="ma")
+            draw.text((x, y0 + h + 18), str(tick), font=font(22, False), fill=INK, anchor="la" if tick == 0 else "ra" if tick == limit else "ma")
         draw.text((x0 + w / 2, y0 + h + 52), unit, font=font(24), fill=INK, anchor="ma")
         worn = next((i + 1 for i, row in enumerate(series) if 1 - row[0] >= 0.5), None)
         permanent = next((i + 1 for i, row in enumerate(series) if row[2] + row[3] >= 0.5), None)
         path = next((i + 1 for i, row in enumerate(series) if row[3] >= 0.5), None)
         for line, (label, value) in enumerate((("half worn", worn), ("half permanent", permanent), ("half path", path))):
-            draw.text((x0, y0 + h + 100 + line * 38), f"{label}: ~{value} {unit}", font=font(28), fill=INK)
+            draw.text((x0, y0 + h + 100 + line * 38), f"{label}: ~{value}", font=font(26), fill=INK)
     x = 60
     for key in keys:
         draw.rectangle((x, 160, x + 34, 194), fill=COLOURS[key], outline=INK, width=3)
