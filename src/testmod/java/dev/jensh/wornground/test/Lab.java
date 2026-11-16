@@ -67,6 +67,8 @@ public final class Lab {
         final int z;
         final int interval;
         final boolean sprint;
+        /** Blocks between landings when the traveller jumps all the way; 0 for plain steps. */
+        final double stride;
         final int maxTrips;
         final RandomSource random;
         final JsonArray centre = new JsonArray();
@@ -74,6 +76,11 @@ public final class Lab {
         int trips;
 
         Lane(String name, int z, int interval, boolean sprint, int maxTrips, long seed) {
+            this(name, z, interval, sprint, 0, maxTrips, seed);
+        }
+
+        Lane(String name, int z, int interval, boolean sprint, double stride, int maxTrips, long seed) {
+            this.stride = stride;
             this.name = name;
             this.z = z;
             this.interval = interval;
@@ -89,8 +96,13 @@ public final class Lab {
             double multiplier = Config.CHANCE_MULTIPLIER.get() * (sprint ? Config.SPRINT_MULTIPLIER.get() : 1.0);
             // People do not walk on rails: each trip picks a line and drifts a little around it.
             int offset = pick();
+            if (stride > 0) multiplier *= Config.LANDING_MULTIPLIER.get();
+            // Jumpers only touch the block they land on, and never take off from exactly the same spot twice.
+            double next = stride > 0 ? random.nextDouble() * stride : 0;
             for (int x = 0; x < LENGTH; x++) {
                 if (random.nextFloat() < 0.1F) offset = Math.clamp(offset + (random.nextBoolean() ? 1 : -1), -1, 1);
+                if (x < (int) next) continue;
+                next += Math.max(stride, 1);
                 WearHandler.tryWear(level, new BlockPos(x, SURFACE, z + offset), multiplier, random);
             }
             trips++;
@@ -203,6 +215,22 @@ public final class Lab {
                 for (int chunkZ = -2; chunkZ <= 5; chunkZ++) level.setChunkForced(chunkX, chunkZ, true);
             }
             if (!mode.endsWith("quick")) server.tickRateManager().requestGameToSprint(Integer.MAX_VALUE);
+            return;
+        }
+        if (mode.equals("jumps")) {
+            int lane = 8;
+            for (int sprint = 0; sprint <= 1; sprint++) {
+                for (int replicate = 0; replicate < REPLICATES; replicate++) {
+                    // Air time of a jump is 12 ticks: about 2.6 blocks walking, 4.3 sprinting.
+                    scenarios.add(new Lane("every-minute/" + (sprint == 1 ? "sprint-jump" : "walk-jump"), lane, 1200,
+                        sprint == 1, sprint == 1 ? 4.3 : 2.6, 400, 1000L * lane + replicate));
+                    lane += 10;
+                }
+            }
+            for (int chunkX = -1; chunkX <= 3; chunkX++) {
+                for (int chunkZ = -1; chunkZ <= (lane >> 4) + 1; chunkZ++) level.setChunkForced(chunkX, chunkZ, true);
+            }
+            server.tickRateManager().requestGameToSprint(Integer.MAX_VALUE);
             return;
         }
         String[] names = {"back-and-forth", "every-minute", "every-5-minutes", "twice-a-day", "once-a-day"};

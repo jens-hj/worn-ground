@@ -129,4 +129,28 @@ public final class WearTests {
             test.assertBlockPresent(Blocks.GRASS_BLOCK, new BlockPos(1, 1, 1));
         });
     }
+
+    /** End to end: a mob dropping onto grass wears the block it lands on, without taking a single step. */
+    @GameTest(template = "empty", timeoutTicks = 200)
+    public static void landingWearsTheGround(GameTestHelper test) {
+        Config.CHANCE_MULTIPLIER.set(ALWAYS);
+        test.setBlock(GROUND, Blocks.GRASS_BLOCK);
+        test.spawnWithNoFreeWill(EntityType.COW, GROUND.above(3));
+        test.succeedWhen(() -> test.assertBlockNotPresent(Blocks.GRASS_BLOCK, GROUND));
+    }
+
+    /** Own batch: it changes the config other tests rely on. */
+    @GameTest(template = "empty", timeoutTicks = 200, batch = "landing_disabled")
+    public static void landingMultiplierZeroDisablesLandingWear(GameTestHelper test) {
+        Config.CHANCE_MULTIPLIER.set(ALWAYS);
+        Config.LANDING_MULTIPLIER.set(0.0);
+        test.setBlock(GROUND, Blocks.PODZOL);
+        var cow = test.spawnWithNoFreeWill(EntityType.COW, GROUND.above(3));
+        test.runAfterDelay(60, () -> {
+            Config.LANDING_MULTIPLIER.set(4.0);
+            test.assertTrue(cow.onGround(), "Cow should have landed");
+            test.assertBlockPresent(Blocks.PODZOL, GROUND);
+            test.succeed();
+        });
+    }
 }
